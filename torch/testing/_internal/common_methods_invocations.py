@@ -9353,6 +9353,21 @@ def sample_inputs_multi_head_attention_forward(opinfo, device, dtype, requires_g
         yield SampleInput(q, args=sample_args, kwargs=sample_kwargs)
 
 
+def sample_inputs_tanh_attention(opinfo, device, dtype, requires_grad, **kwargs):
+    # Shapes: q: (..., Lq, D), k: (..., Lk, D), v: (..., Lk, Ev)
+    samples = []
+
+    # 1) Minimal (no batch), square
+    Lq, Lk, D, Ev = 3, 3, 4, 5
+    q = make_tensor((Lq, D), device=device, dtype=dtype, requires_grad=requires_grad)
+    k = make_tensor((Lk, D), device=device, dtype=dtype, requires_grad=requires_grad)
+    v = make_tensor((Lk, Ev), device=device, dtype=dtype, requires_grad=requires_grad)
+    samples.append(SampleInput(q, args=(k, v)))
+
+    # Add more samples
+
+    return samples
+
 # Includes some values such that N * N won't be a multiple of 4,
 # which should ensure we test the vectorized and non-vectorized
 # kernel code paths.
@@ -16407,6 +16422,16 @@ op_db: list[OpInfo] = [
         skips=(
             DecorateInfo(unittest.expectedFailure, 'TestJit', 'test_variant_consistency_jit'),
         ),
+    ),
+    OpInfo(
+        'aten.tanh_attention',
+        op=torch.ops.aten.tanh_attention,
+        dtypes=floating_and_complex_types() + (torch.bfloat16, torch.float16),
+        sample_inputs_func=sample_inputs_tanh_attention,
+        supports_autograd=True,
+        supports_out=False,
+        check_batched_grad=True,
+        check_batched_gradgrad=True,
     ),
     OpInfo(
         'nn.functional.scaled_dot_product_attention',
