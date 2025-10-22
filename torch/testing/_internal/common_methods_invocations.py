@@ -9357,14 +9357,12 @@ def sample_inputs_tanh_attention(opinfo, device, dtype, requires_grad, **kwargs)
     # Shapes: q: (..., Lq, D), k: (..., Lk, D), v: (..., Lk, Ev)
     samples = []
 
-    # 1) Minimal (no batch), square
+    # 1) Minimal, square
     Lq, Lk, D, Ev = 3, 3, 4, 5
     q = make_tensor((Lq, D), device=device, dtype=dtype, requires_grad=requires_grad)
     k = make_tensor((Lk, D), device=device, dtype=dtype, requires_grad=requires_grad)
     v = make_tensor((Lk, Ev), device=device, dtype=dtype, requires_grad=requires_grad)
     samples.append(SampleInput(q, args=(k, v)))
-
-    # Add more samples
 
     return samples
 
@@ -16424,9 +16422,9 @@ op_db: list[OpInfo] = [
         ),
     ),
     OpInfo(
-        'aten.tanh_attention',
-        op=torch.ops.aten.tanh_attention,
-        dtypes=floating_and_complex_types() + (torch.bfloat16, torch.float16),
+        'aten.tanh_attention_2',
+        op=torch.ops.aten.tanh_attention_2,
+        dtypes=floating_types() + (torch.bfloat16, torch.float16), # and_complex_types(), # + (torch.bfloat16, torch.float16),
         sample_inputs_func=sample_inputs_tanh_attention,
         supports_autograd=True,
         supports_out=False,

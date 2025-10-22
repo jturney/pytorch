@@ -218,6 +218,11 @@
 #
 # NB: The parameter names here MUST be consistent with the parameter names
 # in native_functions.yaml
+- name: tanh_attention_2(Tensor q, Tensor k, Tensor v) -> Tensor
+  q: matmul((matmul(grad, transpose(v, -2, -1)) * (1 - square(tanh(matmul(q, transpose(k, -2, -1)))))), k)
+  k: matmul(transpose((matmul(grad, transpose(v, -2, -1)) * (1 - square(tanh(matmul(q, transpose(k, -2, -1)))))), -2, -1), q)
+  v: matmul(transpose(tanh(matmul(q, transpose(k, -2, -1))), -2, -1), grad)
+
 - name: abs(Tensor self) -> Tensor
   self: grad * self.sgn()
   result: handle_r_to_c(result.scalar_type(), self_t.conj() * self_p.sgn())
