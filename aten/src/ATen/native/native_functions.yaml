@@ -15077,18 +15077,28 @@
   autogen: scaled_dot_product_attention.out
   tags: nondeterministic_seeded
 
-- func: tanh_attention_1(Tensor q, Tensor k, Tensor v) -> Tensor
-  variants: function
-  dispatch:
-    CompositeImplicitAutograd: tanh_attention
-    Meta: tanh_attention_meta
+# - func: tanh_attention_1(Tensor q, Tensor k, Tensor v) -> Tensor
+#   variants: function
+#   dispatch:
+#     CompositeImplicitAutograd: tanh_attention
+#     Meta: tanh_attention_meta
 
-- func: tanh_attention_2(Tensor q, Tensor k, Tensor v) -> Tensor
-  variants: function
-  dispatch:
-    CompositeExplicitAutograd: tanh_attention
-    Meta: tanh_attention_meta
+# - func: tanh_attention_2(Tensor q, Tensor k, Tensor v) -> Tensor
+#   variants: function
+#   dispatch:
+#     CompositeExplicitAutograd: tanh_attention
+#     Meta: tanh_attention_meta
 
+- func: tanh_attention(Tensor q, Tensor k, Tensor v) -> Tensor
+  variants: function
+  structured_delegate: tanh_attention.out
+
+- func: tanh_attention.out(Tensor q, Tensor k, Tensor v, *, Tensor(a!) out) -> Tensor(a!)
+  variants: function
+  structured: True
+  dispatch:
+    CPU: tanh_attention_cpu
+    CUDA: tanh_attention_cuda
 
 # This aten function is kept so that we can test the choice function from Python
 - func: _fused_sdp_choice(Tensor query, Tensor key, Tensor value, Tensor? attn_mask=None, float dropout_p=0.0, bool is_causal=False, *, float? scale=None, bool enable_gqa=False) -> int

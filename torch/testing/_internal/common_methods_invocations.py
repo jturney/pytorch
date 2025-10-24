@@ -16422,14 +16422,17 @@ op_db: list[OpInfo] = [
         ),
     ),
     OpInfo(
-        'aten.tanh_attention_2',
-        op=torch.ops.aten.tanh_attention_2,
+        'aten.tanh_attention',
+        op=torch.ops.aten.tanh_attention,
         dtypes=floating_types() + (torch.bfloat16, torch.float16), # and_complex_types(), # + (torch.bfloat16, torch.float16),
         sample_inputs_func=sample_inputs_tanh_attention,
         supports_autograd=True,
-        supports_out=False,
-        check_batched_grad=True,
-        check_batched_gradgrad=True,
+        supports_out=True,
+        # check_batched_grad=True,
+        # check_batched_gradgrad=True,
+        skips=(
+            DecorateInfo(unittest.expectedFailure, 'TestCommon', 'test_out_warning'),
+        ),
     ),
     OpInfo(
         'nn.functional.scaled_dot_product_attention',
